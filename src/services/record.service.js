@@ -18,10 +18,33 @@ exports.createRecord = async (data) => {
   return result.rows[0];
 };
 
-exports.getRecords = async () => {
-  const result = await pool.query(
-    `SELECT * FROM financial_records ORDER BY created_at DESC`
-  );
+exports.getFilteredRecords = async (filters) => {
+  let query = `SELECT * FROM financial_records WHERE 1=1`;
+  let values = [];
+
+  if (filters.type) {
+    values.push(filters.type);
+    query += ` AND type = $${values.length}`;
+  }
+
+  if (filters.category) {
+    values.push(filters.category);
+    query += ` AND category = $${values.length}`;
+  }
+
+  if (filters.startDate) {
+    values.push(filters.startDate);
+    query += ` AND date >= $${values.length}`;
+  }
+
+  if (filters.endDate) {
+    values.push(filters.endDate);
+    query += ` AND date <= $${values.length}`;
+  }
+
+  query += ` ORDER BY created_at DESC`;
+
+  const result = await pool.query(query, values);
 
   return result.rows;
 };

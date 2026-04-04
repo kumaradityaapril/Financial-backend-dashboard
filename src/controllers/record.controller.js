@@ -11,9 +11,17 @@ exports.createRecord = async (req, res) => {
 
 exports.getRecords = async (req, res) => {
   try {
-    const records = await recordService.getRecords();
+    const { type, category, startDate, endDate } = req.query;
+
+    const records = await recordService.getFilteredRecords({
+      type,
+      category,
+      startDate,
+      endDate,
+    });
+
     res.json(records);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
