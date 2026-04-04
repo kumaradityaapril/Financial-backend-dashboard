@@ -48,3 +48,46 @@ exports.getFilteredRecords = async (filters) => {
 
   return result.rows;
 };
+
+exports.getTotalIncome = async () => {
+  const result = await pool.query(
+    `SELECT COALESCE(SUM(amount), 0) AS total_income 
+     FROM financial_records 
+     WHERE type = 'income'`
+  );
+
+  return result.rows[0];
+};
+
+exports.getTotalExpense = async () => {
+  const result = await pool.query(
+    `SELECT COALESCE(SUM(amount), 0) AS total_expense 
+     FROM financial_records 
+     WHERE type = 'expense'`
+  );
+
+  return result.rows[0];
+};
+
+exports.getNetBalance = async () => {
+  const result = await pool.query(
+    `SELECT 
+       COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) -
+       COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0)
+       AS net_balance
+     FROM financial_records`
+  );
+
+  return result.rows[0];
+};
+
+exports.getCategoryTotals = async () => {
+  const result = await pool.query(
+    `SELECT category, SUM(amount) AS total
+     FROM financial_records
+     GROUP BY category
+     ORDER BY total DESC`
+  );
+
+  return result.rows;
+};

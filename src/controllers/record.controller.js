@@ -25,3 +25,21 @@ exports.getRecords = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+exports.getDashboard = async (req, res) => {
+  try {
+    const income = await recordService.getTotalIncome();
+    const expense = await recordService.getTotalExpense();
+    const balance = await recordService.getNetBalance();
+    const category = await recordService.getCategoryTotals();
+
+    res.json({
+      total_income: income.total_income,
+      total_expense: expense.total_expense,
+      net_balance: balance.net_balance,
+      category_breakdown: category,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
