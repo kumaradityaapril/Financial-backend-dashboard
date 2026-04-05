@@ -91,3 +91,24 @@ exports.getCategoryTotals = async () => {
 
   return result.rows;
 };
+
+exports.updateRecord = async (id, data) => {
+  const result = await pool.query(
+    `UPDATE financial_records
+     SET amount = $1, type = $2, category = $3, date = $4, notes = $5
+     WHERE id = $6
+     RETURNING *`,
+    [data.amount, data.type, data.category, data.date, data.notes, id]
+  );
+
+  return result.rows[0];
+};
+
+exports.deleteRecord = async (id) => {
+  const result = await pool.query(
+    `DELETE FROM financial_records WHERE id = $1 RETURNING *`,
+    [id]
+  );
+
+  return result.rows[0];
+};
